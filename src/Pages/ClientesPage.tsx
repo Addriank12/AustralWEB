@@ -1,21 +1,21 @@
-import React, { useState } from "react";
 import Button from "../Components/Button";
 import { PaginatedTable } from "../Components/PaginatedTable";
 import { Column } from "../Components/Table";
-import { Producto } from "../Models/Producto";
-import { ProductosService } from "../Services/ProductosService";
 import NavigationButton from "../Components/NavigationButton";
+import { ClientesService } from "../Services/ClientesService";
+import { Cliente } from "../Models/Cliente";
+import { useState } from "react";
 
 export default function InventarioPage() {
-    const productosService: ProductosService = new ProductosService();
+    const clientesService: ClientesService = new ClientesService();
     const [reload, setReload] = useState(false);
 
-    const columns: Column<Producto>[] = [
+    const columns: Column<Cliente>[] = [
         { header: "Nombre", accessor: "nombre" },
-        { header: "Precio", accessor: "precio" },
-        { header: "Stock", accessor: "stock" },
+        { header: "Teléfono", accessor: "telefono" },
+        { header: "Email", accessor: "email" },
         { header: "Acciones", accessor: (data) => <div className="flex gap-2">
-            <NavigationButton to={`producto/${data.id}`}>
+            <NavigationButton to={`cliente/${data.id}`}>
                 Editar
             </NavigationButton>
             <Button onClick={() => handleDelete(data.id ?? 0)}>
@@ -25,7 +25,7 @@ export default function InventarioPage() {
     ];
 
     function handleDelete(id: number) {
-        productosService.delete(id).then(() => {
+        clientesService.delete(id).then(() => {
             console.log("Deleted");
             setReload(!reload); // Cambia el estado para forzar la recarga
         }).catch((error) => {
@@ -35,7 +35,7 @@ export default function InventarioPage() {
 
     return (
         <div className="p-5">
-            <PaginatedTable<Producto> columns={columns} dataService={productosService} newRoute={"producto"} key={reload.toString()} />
+            <PaginatedTable<Cliente> columns={columns} dataService={clientesService} newRoute={"cliente"} key={reload.toString()} />
         </div>
     );
 }

@@ -9,7 +9,7 @@ import ProveedoresIcon from "../../assets/proveedor.svg";
 
 export function Sidebar() {
   return (
-    <div className="sidebar bg-[#36363A] p-5 h-screen w-full">
+    <div className="sidebar p-5 h-screen w-full bg-opacity-50 bg-black shadow-md">
       <nav className="space-y-2 px-2">
         <SidebarOption
           Icon={DashboardIcon}
@@ -27,20 +27,35 @@ export function Sidebar() {
           Icon={FacturaIcon}
           title={"Nueva Factura"}
           selected={false}
-          to={""}
+          to={"nuevafactura"}
+        />
+        <SidebarOption
+          Icon={FacturaIcon}
+          title={"Nueva Compra"}
+          selected={false}
+          to={"nuevacompra"}
         />
         <SidebarOption
           Icon={ClientesIcon}
           title={"Clientes"}
           selected={false}
-          to={""}
+          to={"clientes"}
         />
         <SidebarOption
           Icon={ProveedoresIcon}
           title={"Proveedores"}
           selected={false}
-          to={""}
+          to={"proveedores"}
         />
+        <SidebarOption
+          Icon={ProveedoresIcon}
+          title={"Facturas"}
+          selected={false}
+          to={"facturas"}
+        />
+
+
+
       </nav>
     </div>
   );

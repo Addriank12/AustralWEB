@@ -1,7 +1,38 @@
 @import "tailwindcss";
 
+:root {
+  color-scheme: dark;
+  background-color: #091521;
+}
 
+html {
+  font-family: "Onest Variable", system-ui, sans-serif;
+}
 
-:root{
-  background-color: #1C1C1C;
+.background-image {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 25%;
+  z-index: -1;
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+  main {
+    margin-top: 50px;
+    max-width: 100%;
+    padding: 0 1rem;
+  }
+
+  h1 {
+    font-size: 1.5rem;
+  }
+
+  p {
+    font-size: 0.9rem;
+  }
 }
