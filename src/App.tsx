@@ -9,6 +9,9 @@ import ProveedoresPage from "./Pages/ProveedoresPage";
 import { NuevoProveedor } from "./Pages/NuevoProveedor";
 import { NuevaFactura } from "./Pages/Factura/NuevaFactura";
 import FacturasPage from "./Pages/FacturasPage";
+import DashboardPage from "./Pages/DashboardPage";
+import ClienteView from "./cliente-app/ClienteView";
+import ClientLayout from "./Layout/ClientLayout";
 const background = "/src/assets/bk.webp";
 
 function App() {
@@ -17,27 +20,38 @@ function App() {
       <img src={background} alt="" className="background-image" />
       <main>
         <Routes>
-          <Route path="/" element={<Layout />}>
-            <Route path="/inventario" element={<InventarioPage />} />
+          <Route path="/" element={<ClientLayout />}>
+            <Route path="/" element={<ClienteView />} />
+
+            
+          </Route>
+          <Route path="admin" element={<Layout />}>
+            <Route path="inventario" element={<InventarioPage />} />
             <Route
-              path="/inventario/producto/:id"
+              path="inventario/producto/:id"
               element={<NuevoProducto />}
             />
-            <Route path="/inventario/producto" element={<NuevoProducto />} />
-            <Route path="/clientes" element={<ClientesPage />} />
-            <Route path="/clientes/cliente/:id" element={<NuevoCliente />} />
-            <Route path="/clientes/cliente" element={<NuevoCliente />} />
+            <Route path="inventario/producto" element={<NuevoProducto />} />
+            <Route path="clientes" element={<ClientesPage />} />
+            <Route path="clientes/cliente/:id" element={<NuevoCliente />} />
+            <Route path="clientes/cliente" element={<NuevoCliente />} />
 
-            <Route path="/proveedores" element={<ProveedoresPage />} />
+            <Route path="proveedores" element={<ProveedoresPage />} />
             <Route
-              path="/proveedores/proveedor/:id"
+              path="proveedores/proveedor/:id"
               element={<NuevoProveedor />}
             />
-            <Route path="/proveedores/proveedor" element={<NuevoProveedor />} />
-            <Route path="/nuevafactura" element={<NuevaFactura />} />
+            <Route path="proveedores/proveedor" element={<NuevoProveedor />} />
+            <Route path="nuevafactura" element={<NuevaFactura />} />
+            <Route path="nuevacompra" element={<NuevaFactura />} />
 
-            <Route path="/facturas" element={<FacturasPage />} />
-            <Route path="/facturas/factura/:id" element={<NuevaFactura />} />
+            <Route path="facturas" element={<FacturasPage />} />
+            <Route path="facturas/:id" element={<NuevaFactura />} />
+
+            <Route path="compras" element={<FacturasPage />} />
+            <Route path="compras/:id" element={<NuevaFactura />} />
+
+            <Route path="dashboard" element={<DashboardPage />} />
           </Route>
         </Routes>
       </main>

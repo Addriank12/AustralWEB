@@ -1,7 +1,11 @@
-export interface Cliente {
-    id?: number;
-    nombre: string;
-    telefono: string;
-    email: string;
-    direccion?: string;
-  }
+import { Person } from "./Person";
+
+export interface Cliente extends Person {
+  email: string;
+  password?: string;
+}
+
+export interface AuthResponse {
+  token: string;
+  cliente: Cliente;
+}

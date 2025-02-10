@@ -1,6 +1,5 @@
-export interface Proveedor {
-    id?: number;
-    nombre: string;
-    telefono: string;
-    direccion: string;
+import { Person } from "./Person";
+
+export interface Proveedor extends Person {
+
   }

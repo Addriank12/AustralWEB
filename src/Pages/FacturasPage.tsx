@@ -1,20 +1,32 @@
 import { PaginatedTable } from "../Components/PaginatedTable";
 import { Column } from "../Components/Table";
 import NavigationButton from "../Components/NavigationButton";
-import { useState } from "react";
 import { FacturasService } from "../Services/FacturasService";
 import { Factura } from "../Models/Factura";
+import { useLocation } from "react-router-dom";
+import { ComprasService } from "../Services/ComprasService";
 
 export default function FacturasPage() {
-    const facturaService: FacturasService = new FacturasService();
-    const [reload, setReload] = useState(false);
+    
+    const location = useLocation();
 
-    const columns: Column<Factura>[] = [
+    const columnsFC: Column<Factura>[] = [
         { header: "Cliente", accessor: (data) => data.idClienteNavigation?.nombre },
         { header: "Fecha", accessor: "fecha" },
         { header: "Total", accessor: "total" },
         { header: "Acciones", accessor: (data) => <div className="flex gap-2">
-            <NavigationButton to={`factura/${data.id}`}>
+            <NavigationButton to={`${data.id}`}>
+                Ver
+            </NavigationButton>
+        </div> }
+    ];
+
+    const columnsC: Column<Factura>[] = [
+        { header: "Proveedor", accessor: (data) => data.idProveedorNavigation?.nombre },
+        { header: "Fecha", accessor: "fecha" },
+        { header: "Total", accessor: "total" },
+        { header: "Acciones", accessor: (data) => <div className="flex gap-2">
+            <NavigationButton to={`${data.id}`}>
                 Ver
             </NavigationButton>
         </div> }
@@ -22,7 +34,11 @@ export default function FacturasPage() {
 
     return (
         <div className="p-5">
-            <PaginatedTable<Factura> columns={columns} dataService={facturaService} newRoute={"/nuevafactura"} key={reload.toString()} />
+            {location.pathname === "/facturas" ? (
+            <PaginatedTable<Factura> columns={columnsFC} dataService={new FacturasService} newRoute={"/nuevafactura"}  />
+            ) : (
+            <PaginatedTable<Factura> columns={columnsC} dataService={new ComprasService} newRoute={"/nuevacompra"} />
+            )}
         </div>
     );
 }

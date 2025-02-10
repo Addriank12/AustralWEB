@@ -15,7 +15,7 @@ export function Sidebar() {
           Icon={DashboardIcon}
           title={"Dashboard"}
           selected={false}
-          to={""}
+          to={"dashboard"}
         />
         <SidebarOption
           Icon={InventarioIcon}
@@ -52,6 +52,12 @@ export function Sidebar() {
           title={"Facturas"}
           selected={false}
           to={"facturas"}
+        />
+        <SidebarOption
+          Icon={ProveedoresIcon}
+          title={"Compras"}
+          selected={false}
+          to={"compras"}
         />
 
 

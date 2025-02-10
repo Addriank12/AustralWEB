@@ -1,7 +1,4 @@
 import { useEffect, useState } from "react";
-import { Cliente } from "../../Models/Cliente";
-import { CustomerSelection } from "./customer-selection";
-import { ProductSelection } from "./product-selection";
 import { Detalle } from "../../Models/Detalle";
 import { PaymentMethodSelection } from "./PaymentMethodSelection";
 import { Pago } from "../../Models/Pago";
@@ -10,32 +7,56 @@ import Button from "../../Components/Button";
 import { FacturasService } from "../../Services/FacturasService";
 import { Loading } from "../../Components/Loading";
 import { Dialog } from "../../Components/Dialog";
-import { useParams } from "react-router-dom";
+import { useLocation, useParams } from "react-router-dom";
+import { CustomerSelection } from "./Customer-selection";
+import { ProductSelection } from "./Product-selection";
+import { Person } from "../../Models/Person";
+import { ComprasService } from "../../Services/ComprasService";
 
 export function NuevaFactura() {
   const { id } = useParams<{ id: string }>();
+  const location = useLocation();
+
+  const option: string =
+    location.pathname === "/nuevacompra" ||
+    location.pathname.includes("compras")
+      ? "compra"
+      : "factura";
+
   const [isLoading, setIsLoading] = useState(false);
   const [showDialog, setShowDialog] = useState(false);
-  const [selectedCustomer, setSelectedCustomer] = useState<Cliente>();
+  const [selectedCustomer, setSelectedCustomer] = useState<Person>();
   const [detalles, setDetalles] = useState<Detalle[]>([]);
   const [paymentMethod, setPaymentMethod] = useState<Pago>();
   const facturasService: FacturasService = new FacturasService();
+  const comprasService: ComprasService = new ComprasService();
 
-  const [viewCustomer, setViewCustomer] = useState<Cliente>();
+  const [viewCustomer, setViewCustomer] = useState<Person>();
 
   useEffect(() => {
     if (!id) return;
     setIsLoading(true);
-    facturasService
-      .getById(id)
-      .then((item) => {
-        setViewCustomer(item.idClienteNavigation);
-        setPaymentMethod(item.idPagoNavigation);
-        setDetalles(item.detalleFacturas ?? []);
-      })
-      .catch((error) => console.error(error))
-      .finally(() => setIsLoading(false));
-  }, [id]);
+    if (option === "compra") {
+      comprasService
+        .getById(id)
+        .then((item) => {
+          setViewCustomer(item.idProveedorNavigation);
+          setDetalles(item.detalleCompras ?? []);
+        })
+        .catch((error) => console.error(error))
+        .finally(() => setIsLoading(false));
+    } else {
+      facturasService
+        .getById(id)
+        .then((item) => {
+          setViewCustomer(item.idClienteNavigation);
+          setPaymentMethod(item.idPagoNavigation);
+          setDetalles(item.detalleFacturas ?? []);
+        })
+        .catch((error) => console.error(error))
+        .finally(() => setIsLoading(false));
+    }
+  }, [id, option]);
 
   const handleAddProduct = (detalle: Detalle) => {
     setDetalles([...detalles, detalle]);
@@ -70,7 +91,11 @@ export function NuevaFactura() {
         detalles,
       };
 
-      await facturasService.create(newFactura);
+      if (option === "compra") {
+        await comprasService.create(newFactura);
+      } else {
+        await facturasService.create(newFactura);
+      }
     } catch (error) {
       console.error("Error al guardar factura:", error);
     } finally {
@@ -89,20 +114,24 @@ export function NuevaFactura() {
       />
       <div className="p-4 space-y-4 ">
         <CustomerSelection
+          option={option}
           customer={viewCustomer}
           onSelect={setSelectedCustomer}
         />
         <ProductSelection
+          option={option}
           detalles={detalles}
           readOnly={!!id}
           onAddDetalle={handleAddProduct}
           onUpdateDetalle={handleUpdateProduct}
           onRemoveDetalle={handleRemoveProduct}
         />
-        <PaymentMethodSelection paymentMethod={paymentMethod} onSelect={setPaymentMethod} />
+        <PaymentMethodSelection
+          paymentMethod={paymentMethod}
+          onSelect={setPaymentMethod}
+        />
         <InvoiceSummary products={detalles} />
         {!id && <Button onClick={handleSave}>Guardar</Button>}
-        
       </div>
     </>
   );

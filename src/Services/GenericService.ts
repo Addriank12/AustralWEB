@@ -8,7 +8,7 @@ export abstract class GenericService<T> {
     page: number,
     itemsPerPage: number,
     filter: string,
-    options: { signal: AbortSignal }
+    options?: { signal: AbortSignal }
   ): Promise<Page<T>> {
     const params = new URLSearchParams({
       pagina: page.toString(),
@@ -19,7 +19,7 @@ export abstract class GenericService<T> {
     const response = await fetch(
       `${this.baseUrl}${this.serviceUrl}?${params.toString()}`,
       {
-        signal: options.signal, // Pasamos el signal aquí
+        signal: options?.signal, // Pasamos el signal aquí
       }
     );
 

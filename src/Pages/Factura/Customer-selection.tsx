@@ -1,24 +1,29 @@
 import { useEffect, useState } from "react";
 import { ClientesService } from "../../Services/ClientesService";
-import { Cliente } from "../../Models/Cliente";
+import { ProveedoresService } from "../../Services/ProveedoresService";
+import { Person } from "../../Models/Person";
 
 export function CustomerSelection({
   onSelect,
   customer,
+  option,
 }: {
-  onSelect: (value: Cliente) => void;
-  customer?: Cliente | null;
+  onSelect: (value: Person) => void;
+  customer?: Person | null;
+  option: string;
 }) {
   const [open, setOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
-  const [customers, setCustomers] = useState<Cliente[]>([]);
+  const [customers, setCustomers] = useState<Person[]>([]);
+
   const [error, setError] = useState<string | null>(null);
-  const [selectedCustomer, setSelectedCustomer] = useState<Cliente | null>(
+  const [selectedCustomer, setSelectedCustomer] = useState<Person | null>(
     null
   );
   const [readOnly, setReadOnly] = useState(false);
 
   const clientesService = new ClientesService();
+  const proveedoresService = new ProveedoresService();
 
   useEffect(() => {
     if (customer) {
@@ -30,10 +35,18 @@ export function CustomerSelection({
 
     const fetchCustomers = async () => {
       try {
-        const page = await clientesService.getPage(1, 10, searchTerm, {
-          signal: abortController.signal,
-        });
-        setCustomers(page.data);
+        if (option === "compra") {
+          const page = await proveedoresService.getPage(1, 10, searchTerm, {
+            signal: abortController.signal,
+          });
+          setCustomers(page.data);
+        } else {
+          const page = await clientesService.getPage(1, 10, searchTerm, {
+            signal: abortController.signal,
+          });
+          setCustomers(page.data);
+        }
+
         setError(null); // Limpia el error si la solicitud es exitosa
       } catch (err) {
         if (!abortController.signal.aborted) {
@@ -51,11 +64,15 @@ export function CustomerSelection({
       abortController.abort(); // Cancela la solicitud si el componente se desmonta
       clearTimeout(debounceTimer); // Limpia el debounce
     };
-  }, [searchTerm, customer]);
+  }, [searchTerm, customer, option]);
 
   return (
     <div className="bg-[#030711] p-4 rounded-lg shadow-lg">
-      <h2 className="text-xl font-semibold mb-4 text-white">Cliente</h2>
+      {option === "compra" ? (
+        <h2 className="text-xl font-semibold mb-4 text-white">Proveedor</h2>
+      ) : (
+        <h2 className="text-xl font-semibold mb-4 text-white">Cliente</h2>
+      )}
       <div className="relative">
         <button
           disabled={readOnly}

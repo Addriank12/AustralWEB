@@ -1,5 +1,6 @@
 export interface Detalle {
     idProducto: number;
+    precio: number;
     cantidad: number;
-    subtotal: number;
+    readonly subtotal: number;
 }

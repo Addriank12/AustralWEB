@@ -1,12 +1,12 @@
-import { Detalle } from "../../Models/Detalle";
+import {  Detalle } from "../../Models/Detalle";
 
 export function InvoiceSummary({ products }: { products: Detalle[] }) {
   // Calcular el subtotal, impuesto y total
   const subtotal = products.reduce(
-    (sum, product) => sum + product.subtotal * product.cantidad,
+    (sum, product) => sum + product.precio * product.cantidad,
     0
   );
-  const taxRate = 0.1; // 10% de tasa de impuesto
+  const taxRate = 0.15; // 10% de tasa de impuesto
   const tax = subtotal * taxRate;
   const total = subtotal + tax;
 

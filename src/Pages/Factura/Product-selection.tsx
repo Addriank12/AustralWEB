@@ -6,6 +6,7 @@ import { ProductosService } from "../../Services/ProductosService";
 interface ProductSelectionProps {
   detalles: Detalle[];
   readOnly: boolean;
+  option: string,
   onAddDetalle: (detalle: Detalle) => void;
   onUpdateDetalle: (detalle: Detalle) => void;
   onRemoveDetalle: (idProducto: number) => void;
@@ -14,6 +15,7 @@ interface ProductSelectionProps {
 export function ProductSelection({
   detalles,
   readOnly,
+  option,
   onAddDetalle,
   onUpdateDetalle,
   onRemoveDetalle,
@@ -24,6 +26,9 @@ export function ProductSelection({
   const [productos, setProductos] = useState<Producto[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
+  const tipoOperacion: string = option;
+
+
   const productosService: ProductosService = new ProductosService();
 
   // Simula la carga de productos desde una API
@@ -32,8 +37,6 @@ export function ProductSelection({
 
     const fetchProductos = async () => {
       try {
-        // Simulación de una llamada a una API
-
         const response = await productosService.getPage(1, 10, searchTerm, {
           signal: abortController.signal,
         });
@@ -50,10 +53,15 @@ export function ProductSelection({
 
   const handleAddDetalle = () => {
     if (selectedProduct && cantidad > 0) {
-      const subtotal = selectedProduct.precio * cantidad;
+      // Ajustar el precio si es una compra
+      const precio = selectedProduct.precio;
+        tipoOperacion === "compra"
+      const subtotal = precio * cantidad;
+
       const newDetalle: Detalle = {
         idProducto: selectedProduct.id!,
-        cantidad,
+        precio,
+        cantidad, 
         subtotal,
       };
       onAddDetalle(newDetalle);
@@ -76,6 +84,9 @@ export function ProductSelection({
       <h2 className="text-xl font-semibold mb-4 text-white">Productos</h2>
       {!readOnly && (
         <div className="mb-4">
+          
+
+          {/* Buscador de productos */}
           <input
             type="text"
             placeholder="Buscar producto..."
@@ -116,32 +127,49 @@ export function ProductSelection({
           {detalles.map((detalle) => {
             const producto = productos.find((p) => p.id === detalle.idProducto);
             if (!producto) return null;
+
+            // Precio y subtotal basados en el detalle actual
+            const precio = detalle.precio || producto.precio; // Usamos el precio del detalle si existe
+            const subtotal = precio * detalle.cantidad;
+
             return (
               <tr key={detalle.idProducto} className="border-b border-gray-700">
                 <td className="p-2 text-white">{producto.nombre}</td>
-                <td className="p-2 text-white">
-                  ${producto.precio.toFixed(2)}
+                <td className="p-2">
+                  <input
+                    readOnly={readOnly}
+                    type="number"
+                    step="0.01"
+                    value={precio.toFixed(2)}
+                    onChange={(e) => {
+                      const nuevoPrecio = parseFloat(e.target.value) || 0;
+                      onUpdateDetalle({
+                        ...detalle,
+                        precio: nuevoPrecio,
+                        subtotal: nuevoPrecio * detalle.cantidad,
+                      });
+                    }}
+                    className="w-20 p-1 border rounded bg-[#1D283A] text-white"
+                  />
                 </td>
                 <td className="p-2">
                   <input
                     readOnly={readOnly}
                     type="number"
                     value={detalle.cantidad}
-                    onChange={(e) =>
+                    onChange={(e) => {
+                      const nuevaCantidad =
+                        Number.parseInt(e.target.value) || 0;
                       onUpdateDetalle({
                         ...detalle,
-                        cantidad: Number.parseInt(e.target.value) || 0,
-                        subtotal:
-                          producto.precio *
-                          (Number.parseInt(e.target.value) || 0),
-                      })
-                    }
+                        cantidad: nuevaCantidad,
+                        subtotal: precio * nuevaCantidad,
+                      });
+                    }}
                     className="w-20 p-1 border rounded bg-[#1D283A] text-white"
                   />
                 </td>
-                <td className="p-2 text-white">
-                  ${detalle.subtotal.toFixed(2)}
-                </td>
+                <td className="p-2 text-white">${subtotal.toFixed(2)}</td>
                 <td className="p-2">
                   <button
                     onClick={() => onRemoveDetalle(detalle.idProducto)}
@@ -163,7 +191,10 @@ export function ProductSelection({
                 </td>
                 <td className="p-2 text-white">
                   {selectedProduct
-                    ? `$${selectedProduct.precio.toFixed(2)}`
+                    ? `$${(tipoOperacion === "compra"
+                        ? selectedProduct.precio
+                        : selectedProduct.precio
+                      ).toFixed(2)}`
                     : "-"}
                 </td>
                 <td className="p-2">
@@ -179,7 +210,9 @@ export function ProductSelection({
                 <td className="p-2 text-white">
                   $
                   {(selectedProduct
-                    ? selectedProduct.precio * cantidad
+                    ? (tipoOperacion === "compra"
+                        ? selectedProduct.precio
+                        : selectedProduct.precio) * cantidad
                     : 0
                   ).toFixed(2)}
                 </td>
