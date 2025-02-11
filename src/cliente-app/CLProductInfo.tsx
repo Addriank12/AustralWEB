@@ -7,7 +7,7 @@ import { CSSProperties } from "react";
 import placeholderIcon from "../assets/placeholder.svg";
 import { Loading } from "../Components/Loading";
 
-export default function ProductInfo1() {
+export default function CLProductInfo() {
   const { id } = useParams<{ id: string }>();
 
   const { addToCart } = useCart();
