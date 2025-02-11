@@ -12,9 +12,9 @@ import FacturasPage from "./Pages/FacturasPage";
 import DashboardPage from "./Pages/DashboardPage";
 import ClienteView from "./cliente-app/ClienteView";
 import ClientLayout from "./Layout/ClientLayout";
-import ProductInfo from "./cliente-app/productInfo";
 import AuthForm from "./cliente-app/AuthForm";
 import AuthLayout from "./Layout/AuthLayout";
+import ProductInfo from "./cliente-app/productInfo";
 const background = "/src/assets/bk.webp";
 
 function App() {

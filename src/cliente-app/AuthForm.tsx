@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { AuthService } from "../Services/AuthService";
-import { AuthResponse, Cliente } from "../Models/Cliente";
+import {  Cliente } from "../Models/Cliente";
 
 
 const AuthForm: React.FC = () => {
@@ -20,10 +20,9 @@ const AuthForm: React.FC = () => {
     e.preventDefault();
     setError("");
 
-    try {
-      let response: AuthResponse;
+    try {      
       if (isLogin) {
-        response = await AuthService.login(email, password);
+        await AuthService.login(email, password);
       } else {
         const cliente: Cliente = {
           nombre,
@@ -32,7 +31,7 @@ const AuthForm: React.FC = () => {
           telefono,
           password,
         };
-        response = await AuthService.register(cliente);
+        await AuthService.register(cliente);
       }
       window.location.href = "/";
 

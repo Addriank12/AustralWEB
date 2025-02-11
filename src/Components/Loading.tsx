@@ -1,5 +1,3 @@
-import { TailSpin } from "react-loader-spinner";
-
 export function Loading({ isOpen }: { isOpen: boolean }) {
   if (!isOpen) return null;
 

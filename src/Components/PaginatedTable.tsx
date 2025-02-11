@@ -18,7 +18,7 @@ export function PaginatedTable<T extends object>({
 }: PaginatedTableProps<T>) {
   const [isLoading, setIsLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage, setItemsPerPage] = useState(10);
+  const itemsPerPage = 10;
   const [currentData, setCurrentData] = useState<T[]>([]);
   const [filter, setFilter] = useState("");
   const [totalPages, setTotalPages] = useState(0);
