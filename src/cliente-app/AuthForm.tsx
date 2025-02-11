@@ -121,12 +121,7 @@ const AuthForm: React.FC = () => {
           
         </p>
       </div>
-      <button
-            onClick={() => AuthService.logout()}
-            style={styles.switchButton}
-          >
-            panic
-          </button>
+      
     </div>
   );
 };
