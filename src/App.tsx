@@ -14,7 +14,7 @@ import ClienteView from "./cliente-app/ClienteView";
 import ClientLayout from "./Layout/ClientLayout";
 import AuthForm from "./cliente-app/AuthForm";
 import AuthLayout from "./Layout/AuthLayout";
-import ProductInfo from "./cliente-app/productInfo";
+import ProductInfo1 from "./cliente-app/productInfo";
 const background = "/src/assets/bk.webp";
 
 function App() {
@@ -25,7 +25,7 @@ function App() {
         <Routes>
           <Route path="/" element={<ClientLayout />}>
             <Route path="/" element={<ClienteView />} />
-            <Route path="product/:id" element={<ProductInfo />} />
+            <Route path="product/:id" element={<ProductInfo1 />} />
             
           </Route>
           <Route path="login" element={<AuthLayout />}>
