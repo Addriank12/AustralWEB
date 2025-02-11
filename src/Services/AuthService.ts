@@ -1,34 +1,50 @@
-import { AuthResponse, Cliente } from '../Models/Cliente';
-
-const API_URL = 'http://localhost:5000/api/auth'; // Cambia la URL según tu backend
+import { AuthResponse, Cliente } from "../Models/Cliente";
 
 export const AuthService = {
     async login(email: string, password: string): Promise<AuthResponse> {
-        const response = await fetch(`${API_URL}/login`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ email, password }),
-        });
-        if (!response.ok) {
-            throw new Error('Network response was not ok');
+        try {
+            const response = await fetch(`https://localhost:7035/login`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ email, password }),
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.message || 'Network response was not ok');
+            }
+
+            const data: AuthResponse = await response.json();
+            localStorage.setItem('token', data.token || '');
+            localStorage.setItem('cliente', data.cliente ? JSON.stringify(data.cliente) : '');
+            return data;
+        } catch (error) {
+            throw new Error(error instanceof Error ? error.message : 'Error during login');
         }
-        return response.json();
     },
 
     async register(cliente: Cliente): Promise<AuthResponse> {
-        const response = await fetch(`${API_URL}/register`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(cliente),
-        });
-        if (!response.ok) {
-            throw new Error('Network response was not ok');
+        try {
+            const response = await fetch(`https://localhost:7035/register`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(cliente),
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.message || 'Network response was not ok');
+            }
+
+            const data: AuthResponse = await response.json();
+            return data;
+        } catch (error) {
+            throw new Error(error instanceof Error ? error.message : 'Error during registration');
         }
-        return response.json();
     },
 
     logout(): void {

@@ -12,6 +12,9 @@ import FacturasPage from "./Pages/FacturasPage";
 import DashboardPage from "./Pages/DashboardPage";
 import ClienteView from "./cliente-app/ClienteView";
 import ClientLayout from "./Layout/ClientLayout";
+import ProductInfo from "./cliente-app/productInfo";
+import AuthForm from "./cliente-app/AuthForm";
+import AuthLayout from "./Layout/AuthLayout";
 const background = "/src/assets/bk.webp";
 
 function App() {
@@ -22,7 +25,11 @@ function App() {
         <Routes>
           <Route path="/" element={<ClientLayout />}>
             <Route path="/" element={<ClienteView />} />
-
+            <Route path="product/:id" element={<ProductInfo />} />
+            
+          </Route>
+          <Route path="login" element={<AuthLayout />}>
+            <Route path="/login" element={<AuthForm />} />
             
           </Route>
           <Route path="admin" element={<Layout />}>
@@ -52,6 +59,8 @@ function App() {
             <Route path="compras/:id" element={<NuevaFactura />} />
 
             <Route path="dashboard" element={<DashboardPage />} />
+           
+
           </Route>
         </Routes>
       </main>

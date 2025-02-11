@@ -4,13 +4,13 @@ import InventarioIcon from "../../assets/inventario.svg";
 import FacturaIcon from "../../assets/factura.svg";
 import ClientesIcon from "../../assets/clientes.svg";
 import ProveedoresIcon from "../../assets/proveedor.svg";
-
-
+import ComprasIcon from "../../assets/compras.svg";
+import FacturasIcon from "../../assets/facturas.svg";
 
 export function Sidebar() {
   return (
-    <div className="sidebar p-5 h-screen w-full bg-opacity-50 bg-black shadow-md">
-      <nav className="space-y-2 px-2">
+    <div className="sidebar p-5 h-screen w-64 bg-gray-900 bg-opacity-90 shadow-lg">
+      <nav className="space-y-2">
         <SidebarOption
           Icon={DashboardIcon}
           title={"Dashboard"}
@@ -30,7 +30,7 @@ export function Sidebar() {
           to={"nuevafactura"}
         />
         <SidebarOption
-          Icon={FacturaIcon}
+          Icon={ComprasIcon}
           title={"Nueva Compra"}
           selected={false}
           to={"nuevacompra"}
@@ -48,20 +48,17 @@ export function Sidebar() {
           to={"proveedores"}
         />
         <SidebarOption
-          Icon={ProveedoresIcon}
+          Icon={FacturasIcon}
           title={"Facturas"}
           selected={false}
           to={"facturas"}
         />
         <SidebarOption
-          Icon={ProveedoresIcon}
+          Icon={FacturasIcon}
           title={"Compras"}
           selected={false}
           to={"compras"}
         />
-
-
-
       </nav>
     </div>
   );

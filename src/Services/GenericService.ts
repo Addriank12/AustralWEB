@@ -4,6 +4,25 @@ export abstract class GenericService<T> {
   abstract serviceUrl: string;
   private readonly baseUrl = "https://localhost:7035";
 
+  private getAuthHeader(): { [key: string]: string } {
+    const token = localStorage.getItem('token');
+    return token ? { 'Authorization': `Bearer ${token}` } : {};
+  }
+
+  private async handleResponse(response: Response): Promise<any> {
+    if (response.status === 401) {
+      // Si el error es Unauthorized, lanzamos un error específico
+      alert("Debe iniciar sesión para acceder a este recurso.");
+    }
+
+    if (!response.ok) {
+      // Para otros errores, lanzamos un error genérico
+      throw new Error("Failed to fetch data");
+    }
+
+    return await response.json();
+  }
+
   async getPage(
     page: number,
     itemsPerPage: number,
@@ -19,31 +38,32 @@ export abstract class GenericService<T> {
     const response = await fetch(
       `${this.baseUrl}${this.serviceUrl}?${params.toString()}`,
       {
-        signal: options?.signal, // Pasamos el signal aquí
+        signal: options?.signal,
+        headers: {
+          ...this.getAuthHeader(),
+        },
       }
     );
 
-    if (!response.ok) {
-      throw new Error("Failed to fetch data");
-    }
-
-    return await response.json();
+    return this.handleResponse(response);
   }
 
   async getAll(): Promise<T[]> {
-    const response = await fetch(`${this.baseUrl}${this.serviceUrl}`);
-    if (!response.ok) {
-      throw new Error("Failed to fetch data");
-    }
-    return await response.json();
+    const response = await fetch(`${this.baseUrl}${this.serviceUrl}`, {
+      headers: {
+        ...this.getAuthHeader(),
+      },
+    });
+    return this.handleResponse(response);
   }
 
   async getById(id: string): Promise<T> {
-    const response = await fetch(`${this.baseUrl}${this.serviceUrl}/${id}`);
-    if (!response.ok) {
-      throw new Error("Failed to fetch data");
-    }
-    return await response.json();
+    const response = await fetch(`${this.baseUrl}${this.serviceUrl}/${id}`, {
+      headers: {
+        ...this.getAuthHeader(),
+      },
+    });
+    return this.handleResponse(response);
   }
 
   async create(item: T): Promise<T> {
@@ -51,13 +71,11 @@ export abstract class GenericService<T> {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        ...this.getAuthHeader(),
       },
       body: JSON.stringify(item),
     });
-    if (!response.ok) {
-      throw new Error("Failed to create item");
-    }
-    return await response.json();
+    return this.handleResponse(response);
   }
 
   async update(id: string, item: T): Promise<T> {
@@ -65,21 +83,20 @@ export abstract class GenericService<T> {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
+        ...this.getAuthHeader(),
       },
       body: JSON.stringify(item),
     });
-    if (!response.ok) {
-      throw new Error("Failed to update item");
-    }
-    return await response.json();
+    return this.handleResponse(response);
   }
 
   async delete(id: number): Promise<void> {
     const response = await fetch(`${this.baseUrl}${this.serviceUrl}/${id}`, {
       method: "DELETE",
+      headers: {
+        ...this.getAuthHeader(),
+      },
     });
-    if (!response.ok) {
-      throw new Error("Failed to delete item");
-    }
+    await this.handleResponse(response);
   }
 }

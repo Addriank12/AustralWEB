@@ -24,7 +24,7 @@ export function NuevoProveedor() {
       .then((item) => {
         setNombre(item.nombre);
         setTelefono(item.telefono);
-        setDireccion(item.direccion);
+        setDireccion(item.direccion ?? "");
       })
       .catch((error) => console.error(error))
       .finally(() => setIsLoading(false));

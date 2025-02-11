@@ -1,373 +1,154 @@
-import React, { useEffect, useState } from "react";
-import { ItemCarrito } from "../Models/ItemCarrito";
+import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import { Producto } from "../Models/Producto";
-import { Factura } from "../Models/Factura";
 import { ProductosService } from "../Services/ProductosService";
-import { FacturasService } from "../Services/FacturasService";
-import { Cliente } from "../Models/Cliente";
-import { Detalle } from "../Models/Detalle";
-import { AuthService } from "../Services/AuthService";
-import AuthForm from "../Layout/AuthForm";
+import placeholderIcon from "../assets/placeholder.svg";
+import { Loading } from "../Components/Loading";
 
-const ClienteView: React.FC = () => {
+export default function Home() {
+  const [searchTerm, setSearchTerm] = useState("");
   const [productos, setProductos] = useState<Producto[]>([]);
-  const [carrito, setCarrito] = useState<ItemCarrito[]>([]);
-  const [cliente, setCliente] = useState<Cliente | null>(null);
-  const [mostrarFormularioCliente, setMostrarFormularioCliente] =
-    useState(false);
-  const [facturaGenerada, setFacturaGenerada] = useState<Factura | null>(null);
-  const [mostrarAuthForm, setMostrarAuthForm] = useState(false);
-
+  const [isLoading, setIsLoading] = useState(true);
   const productosService: ProductosService = new ProductosService();
-  const facturaService: FacturasService = new FacturasService();
 
   useEffect(() => {
-    // Obtener productos desde el backend
+    setIsLoading(true);
     productosService
-      .getPage(1, 10, "")
+      .getPage(1, 10, searchTerm)
       .then((response) => setProductos(response.data))
-      .catch((error) => console.error("Error fetching data:", error));
+      .catch((error) => console.error("Error fetching data:", error))
+      .finally(() => setIsLoading(false));
 
-    // Verificar si el cliente ya está autenticado
-    const cliente = AuthService.getCurrentCliente();
-    if (cliente) {
-      setCliente(cliente);
-    }
-  }, []);
-
-  // Función para manejar el inicio de sesión/registro
-  const handleLogin = (cliente: Cliente) => {
-    setCliente(cliente);
-    setMostrarAuthForm(false);
-  };
-
-  // Función para cerrar sesión
-  const handleLogout = () => {
-    AuthService.logout();
-    setCliente(null);
-  };
-
-  // Función para añadir un producto al carrito
-  const agregarAlCarrito = (producto: Producto) => {
-    const itemExistente = carrito.find(
-      (item) => item.producto.id === producto.id
-    );
-
-    if (itemExistente) {
-      // Verificar si hay suficiente stock
-      if (itemExistente.cantidad + 1 > producto.stock) {
-        alert("No hay suficiente stock disponible.");
-        return;
-      }
-      // Si el producto ya está en el carrito, aumenta la cantidad
-      setCarrito(
-        carrito.map((item) =>
-          item.producto.id === producto.id
-            ? { ...item, cantidad: item.cantidad + 1 }
-            : item
-        )
-      );
-    } else {
-      // Si el producto no está en el carrito, lo añade
-      if (producto.stock < 1) {
-        alert("No hay suficiente stock disponible.");
-        return;
-      }
-      setCarrito([...carrito, { producto, cantidad: 1 }]);
-    }
-  };
-
-  // Función para eliminar un producto del carrito
-  const eliminarDelCarrito = (id: number) => {
-    setCarrito(carrito.filter((item) => item.producto.id !== id));
-  };
-
-  // Función para actualizar la cantidad de un producto en el carrito
-  const actualizarCantidad = (id: number, cantidad: number) => {
-    if (cantidad <= 0) {
-      eliminarDelCarrito(id);
-    } else {
-      setCarrito(
-        carrito.map((item) =>
-          item.producto.id === id ? { ...item, cantidad } : item
-        )
-      );
-    }
-  };
-
-  // Calcular el total del carrito
-  const totalCarrito = carrito.reduce(
-    (total, item) => total + item.producto.precio * item.cantidad,
-    0
-  );
-
-  // Función para manejar el cambio en los datos del cliente
-  const handleClienteChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    if (cliente) {
-      setCliente({ ...cliente, [name]: value });
-    }
-  };
-
-  // Función para generar la factura
-  const generarFactura = async () => {
-    if (
-      !cliente?.nombre ||
-      !cliente?.direccion ||
-      !cliente?.email ||
-      !cliente?.telefono
-    ) {
-      alert("Por favor, complete todos los datos del cliente.");
-      return;
-    }
-
-    // Crear los detalles de la factura
-    const detalles: Detalle[] = carrito.map((item) => ({
-      idProducto: item.producto.id ?? 0,
-      precio: item.producto.precio,
-      cantidad: item.cantidad,
-      subtotal: item.producto.precio * item.cantidad,
-    }));
-
-    // Crear la factura
-    const factura: Factura = {
-      fecha: new Date(),
-      total: totalCarrito,
-      idCliente: cliente?.id ?? 0,
-      pago: {
-        metodo: "Efectivo", // Puedes cambiar esto según el método de pago
-        monto: totalCarrito,
-      },
-      detalles: detalles,
-      idEmpleado: 0,
-    };
-
-    try {
-      const response = await facturaService.create(factura);
-      setFacturaGenerada(response);
-      alert("Factura generada exitosamente.");
-      setCarrito([]); // Vaciar el carrito después de generar la factura
-    } catch (error) {
-      console.error("Error al generar la factura:", error);
-      alert("Hubo un error al generar la factura.");
-    }
-  };
+  }, [searchTerm]);
 
   return (
-    <div className="bg-[#030711] p-4 min-h-screen text-white">
-      {mostrarAuthForm && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-          <AuthForm
-            onLogin={(cliente) => {
-              setCliente(cliente);
-              setMostrarAuthForm(false);
-            }}
-          />
-        </div>
-      )}
-      <div className="flex justify-end mb-4">
-        {cliente ? (
-          <div className="flex items-center">
-            <p className="text-gray-400 mr-4">Bienvenido, {cliente.nombre}</p>
-            <button
-              onClick={handleLogout}
-              className="bg-red-600 text-white py-2 px-4 rounded-lg hover:bg-red-700"
-            >
-              Cerrar Sesión
-            </button>
-          </div>
-        ) : (
-          <button
-            onClick={() => setMostrarAuthForm(true)}
-            className="bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700"
-          >
-            Iniciar Sesión
-          </button>
-        )}
-      </div>
-
-      <h1 className="text-2xl font-bold mb-4">Catálogo de Productos</h1>
-
-      {/* Catálogo de Productos */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
-        {productos.map((producto) => (
-          <div
-            key={producto.id}
-            className="bg-[#1D283A] p-4 rounded-lg shadow-lg"
-          >
-            {producto.imagen && (
-              <img
-                src={producto.imagen}
-                alt={producto.nombre}
-                className="w-full h-48 object-cover rounded-lg mb-4"
+    <>
+      {!localStorage.getItem("cliente") ? (
+        (() => {  
+          console.log(localStorage.getItem("cliente")); // Solo para depuración
+          window.location.href = "/login"; // Redirigir al login
+          return null; // No renderizar nada
+        })()
+      ) : (
+        <>
+          <Loading isOpen={isLoading}/>
+          <div style={styles.container}>
+            <h1 style={styles.title}>Nuestra Tienda Online</h1>
+            <div style={styles.searchContainer}>
+              <input
+                type="text"
+                placeholder="Buscar productos..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                style={styles.searchInput}
               />
-            )}
-            <h2 className="text-xl font-semibold">{producto.nombre}</h2>
-            <p className="text-gray-400">${producto.precio.toFixed(2)}</p>
-            <p className="text-gray-400">Stock: {producto.stock}</p>
-            <button
-              onClick={() => agregarAlCarrito(producto)}
-              className="mt-4 w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700"
-            >
-              Añadir al carrito
-            </button>
-          </div>
-        ))}
-      </div>
-
-      {/* Carrito de Compras */}
-      <div className="bg-[#1D283A] p-6 rounded-lg shadow-lg">
-        <h2 className="text-xl font-semibold mb-4">Carrito de Compras</h2>
-        {carrito.length === 0 ? (
-          <p className="text-gray-400">El carrito está vacío.</p>
-        ) : (
-          <>
-            <ul>
-              {carrito.map((item) => (
-                <li key={item.producto.id} className="mb-4">
-                  <div className="flex justify-between items-center">
-                    <div>
-                      <h3 className="text-lg font-semibold">
-                        {item.producto.nombre}
-                      </h3>
-                      <p className="text-gray-400">
-                        ${item.producto.precio.toFixed(2)}
-                      </p>
-                    </div>
-                    <div className="flex items-center">
-                      <input
-                        type="number"
-                        value={item.cantidad}
-                        onChange={(e) =>
-                          actualizarCantidad(
-                            item.producto.id ?? 0,
-                            parseInt(e.target.value)
-                          )
-                        }
-                        className="w-16 p-2 border rounded-lg bg-[#030711] text-white"
-                        min="1"
-                      />
-                      <button
-                        onClick={() =>
-                          eliminarDelCarrito(item.producto.id ?? 0)
-                        }
-                        className="ml-4 text-red-600 hover:text-red-800"
-                      >
-                        🗑️
-                      </button>
-                    </div>
-                  </div>
-                </li>
-              ))}
-            </ul>
-            <div className="mt-6">
-              <p className="text-xl font-semibold">
-                Total: ${totalCarrito.toFixed(2)}
-              </p>
-              <button
-                onClick={() => setMostrarFormularioCliente(true)}
-                className="mt-4 w-full bg-green-600 text-white py-2 rounded-lg hover:bg-green-700"
-              >
-                Finalizar Compra
-              </button>
             </div>
-          </>
-        )}
-      </div>
-
-      {/* Formulario del Cliente */}
-      {mostrarFormularioCliente && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-          <div className="bg-[#1D283A] p-6 rounded-lg shadow-lg w-96">
-            <h2 className="text-xl font-semibold mb-4">Datos del Cliente</h2>
-            <form>
-              <div className="mb-4">
-                <label className="block text-gray-400">Nombre</label>
-                <input
-                  type="text"
-                  name="nombre"
-                  value={cliente?.nombre}
-                  onChange={handleClienteChange}
-                  className="w-full p-2 border rounded-lg bg-[#030711] text-white"
-                  required
-                />
-              </div>
-              <div className="mb-4">
-                <label className="block text-gray-400">Dirección</label>
-                <input
-                  type="text"
-                  name="direccion"
-                  value={cliente?.direccion}
-                  onChange={handleClienteChange}
-                  className="w-full p-2 border rounded-lg bg-[#030711] text-white"
-                  required
-                />
-              </div>
-              <div className="mb-4">
-                <label className="block text-gray-400">Email</label>
-                <input
-                  type="email"
-                  name="email"
-                  value={cliente?.email}
-                  onChange={handleClienteChange}
-                  className="w-full p-2 border rounded-lg bg-[#030711] text-white"
-                  required
-                />
-              </div>
-              <div className="mb-4">
-                <label className="block text-gray-400">Teléfono</label>
-                <input
-                  type="text"
-                  name="telefono"
-                  value={cliente?.telefono}
-                  onChange={handleClienteChange}
-                  className="w-full p-2 border rounded-lg bg-[#030711] text-white"
-                  required
-                />
-              </div>
-              <div className="flex justify-end">
-                <button
-                  type="button"
-                  onClick={() => setMostrarFormularioCliente(false)}
-                  className="mr-2 bg-gray-600 text-white py-2 px-4 rounded-lg hover:bg-gray-700"
-                >
-                  Cancelar
-                </button>
-                <button
-                  type="button"
-                  onClick={generarFactura}
-                  className="bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700"
-                >
-                  Generar Factura
-                </button>
-              </div>
-            </form>
+            <div style={styles.grid}>
+              {productos.map((product) => (
+                <div key={product.id} style={styles.card}>
+                  <div style={styles.cardHeader}>
+                    <h2 style={styles.cardTitle}>{product.nombre}</h2>
+                  </div>
+                  <div style={styles.cardContent}>
+                    <img
+                      src={product.imagen || placeholderIcon}
+                      alt={product.nombre}
+                      style={styles.productImage as React.CSSProperties}
+                    />
+                    <p style={styles.productDescription}>
+                      {product.descripcion}
+                    </p>
+                    <p style={styles.productPrice}>
+                      ${product.precio.toFixed(2)}
+                    </p>
+                  </div>
+                  <div style={styles.cardFooter as React.CSSProperties}>
+                    <Link to={`/product/${product.id}`}>
+                      <button style={styles.detailsButton}>Ver Detalles</button>
+                    </Link>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
-        </div>
+        </>
       )}
-
-      {/* Mostrar Factura Generada */}
-      {facturaGenerada && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-          <div className="bg-[#1D283A] p-6 rounded-lg shadow-lg w-96">
-            <h2 className="text-xl font-semibold mb-4">Factura Generada</h2>
-            <p className="text-gray-400">
-              Número de Factura: {facturaGenerada.id}
-            </p>
-            <p className="text-gray-400">
-              Total: ${facturaGenerada.total.toFixed(2)}
-            </p>
-            <button
-              onClick={() => setFacturaGenerada(null)}
-              className="mt-4 w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700"
-            >
-              Cerrar
-            </button>
-          </div>
-        </div>
-      )}
-    </div>
+    </>
   );
-};
+}
 
-export default ClienteView;
+// Estilos en línea
+const styles = {
+  container: {
+    maxWidth: "1200px",
+    margin: "0 auto",
+    padding: "32px",
+  },
+  title: {
+    fontSize: "32px",
+    fontWeight: "bold",
+    marginBottom: "32px",
+  },
+  searchContainer: {
+    marginBottom: "24px",
+  },
+  searchInput: {
+    width: "100%",
+    maxWidth: "400px",
+    padding: "10px",
+    borderRadius: "4px",
+    border: "1px solid #ccc",
+    fontSize: "16px",
+  },
+  grid: {
+    display: "grid",
+    gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
+    gap: "24px",
+  },
+  card: {
+    backgroundColor: "#ffffff",
+    borderRadius: "8px",
+    boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
+    overflow: "hidden",
+  },
+  cardHeader: {
+    padding: "16px",
+    borderBottom: "1px solid #eee",
+  },
+  cardTitle: {
+    fontSize: "20px",
+    fontWeight: "bold",
+  },
+  cardContent: {
+    padding: "16px",
+  },
+  productImage: {
+    width: "100%",
+    height: "200px",
+    objectFit: "cover",
+    marginBottom: "16px",
+  },
+  productDescription: {
+    color: "#666",
+    fontSize: "14px",
+    marginBottom: "16px",
+  },
+  productPrice: {
+    fontSize: "18px",
+    fontWeight: "bold",
+  },
+  cardFooter: {
+    padding: "16px",
+    borderTop: "1px solid #eee",
+    textAlign: "center",
+  },
+  detailsButton: {
+    backgroundColor: "#3b82f6",
+    color: "#ffffff",
+    border: "none",
+    borderRadius: "4px",
+    padding: "10px 20px",
+    cursor: "pointer",
+    fontSize: "16px",
+  },
+};

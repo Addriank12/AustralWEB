@@ -18,7 +18,7 @@ export function NuevaFactura() {
   const location = useLocation();
 
   const option: string =
-    location.pathname === "/nuevacompra" ||
+    location.pathname === "/admin/nuevacompra" ||
     location.pathname.includes("compras")
       ? "compra"
       : "factura";

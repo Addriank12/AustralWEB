@@ -6,6 +6,7 @@ export interface Cliente extends Person {
 }
 
 export interface AuthResponse {
-  token: string;
-  cliente: Cliente;
+  message: string;
+  token?: string; // Si el backend devuelve un token JWT
+  cliente?: number; // Si el backend devuelve el ID del cliente
 }

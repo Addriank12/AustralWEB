@@ -12,9 +12,16 @@ export function SidebarOption({
   to: string;
 }) {
   return (
-    <Link to={to} className={`flex items-center space-x-5 p-2 rounded-sm transition-colors text-white duration-200 ${selected ? 'bg-blue-500' : 'bg-[#030711]'} hover:bg-blue-600`}>
-      <img className="w-6 h-6" src={Icon} />
-      <span className="text-md font-medium ">{title}</span>
+    <Link
+      to={to}
+      className={`flex items-center space-x-4 p-3 rounded-lg transition-colors duration-200 ${
+        selected
+          ? "bg-blue-600 text-white"
+          : "text-gray-300 hover:bg-gray-700 hover:text-white"
+      }`}
+    >
+      <img className="w-6 h-6" src={Icon} alt={title} />
+      <span className="text-md font-semibold">{title}</span>
     </Link>
   );
 }

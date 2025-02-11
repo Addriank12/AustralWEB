@@ -8,6 +8,8 @@ import { useParams } from "react-router-dom";
 export function NuevoProducto() {
   const { id } = useParams<{ id: string }>();
   const [nombre, setNombre] = useState("");
+  const [descripcion, setDescripcion] = useState("");
+  const [imagen, setImagen] = useState("");
   const [precio, setPrecio] = useState(0);
   const [stock, setStock] = useState(0);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
@@ -40,6 +42,8 @@ export function NuevoProducto() {
           nombre,
           precio,
           stock,
+          descripcion,
+          imagen
         })
         .then(() => setShowDialog(true))
         .catch((error) => {
@@ -52,6 +56,8 @@ export function NuevoProducto() {
           nombre,
           precio,
           stock,
+          descripcion,
+          imagen
         })
         .then(() => setShowDialog(true))
         .catch((error) => {

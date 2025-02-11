@@ -11,6 +11,8 @@ import {
   Legend,
 } from "chart.js";
 import { Loading } from "../Components/Loading";
+import { DashboardData } from "../Models/DashboardData";
+import { DashboardService } from "../Services/DashboardService";
 
 // Registrar componentes de Chart.js
 ChartJS.register(
@@ -23,28 +25,20 @@ ChartJS.register(
   Legend
 );
 
-// Definir la interfaz para los datos del dashboard
-interface DashboardData {
-  totalVentas: number;
-  totalCompras: number;
-  totalGanancias: number;
-  totalClientes: number;
-  gananciasPorMes: { mes: string; ganancia: number }[];
-}
-
 const Dashboard: React.FC = () => {
   const [data, setData] = useState<DashboardData | null>(null);
+  const dashboardService: DashboardService = new DashboardService();
 
   useEffect(() => {
     // Fetch data from the backend
-    fetch("https://localhost:7035/api/dashboard")
-      .then((response) => response.json())
+    dashboardService
+      .getById("")
       .then((data: DashboardData) => setData(data))
       .catch((error) => console.error("Error fetching data:", error));
   }, []);
 
   if (!data) {
-    return <Loading isOpen={true}/>;
+    return <Loading isOpen={true} />;
   }
 
   // Datos para la gráfica de ganancias por mes

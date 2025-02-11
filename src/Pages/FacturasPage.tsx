@@ -34,7 +34,7 @@ export default function FacturasPage() {
 
     return (
         <div className="p-5">
-            {location.pathname === "/facturas" ? (
+            {location.pathname === "/admin/facturas" ? (
             <PaginatedTable<Factura> columns={columnsFC} dataService={new FacturasService} newRoute={"/nuevafactura"}  />
             ) : (
             <PaginatedTable<Factura> columns={columnsC} dataService={new ComprasService} newRoute={"/nuevacompra"} />
