@@ -3,7 +3,7 @@ import { AuthResponse, Cliente } from "../Models/Cliente";
 export const AuthService = {
     async login(email: string, password: string): Promise<AuthResponse> {
         try {
-            const response = await fetch(`https://localhost:7035/login`, {
+            const response = await fetch(`https://austral-dkd0akd9cvc8frb3.brazilsouth-01.azurewebsites.net/login`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -27,7 +27,7 @@ export const AuthService = {
 
     async register(cliente: Cliente): Promise<AuthResponse> {
         try {
-            const response = await fetch(`https://localhost:7035/register`, {
+            const response = await fetch(`https://austral-dkd0akd9cvc8frb3.brazilsouth-01.azurewebsites.net/register`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

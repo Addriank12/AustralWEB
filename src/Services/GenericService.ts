@@ -2,7 +2,7 @@ import { Page } from "../Models/Page";
 
 export abstract class GenericService<T> {
   abstract serviceUrl: string;
-  private readonly baseUrl = "https://localhost:7035";
+  private readonly baseUrl = "https://austral-dkd0akd9cvc8frb3.brazilsouth-01.azurewebsites.net/";
 
   private getAuthHeader(): { [key: string]: string } {
     const token = localStorage.getItem('token');
