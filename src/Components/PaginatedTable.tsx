@@ -89,7 +89,7 @@ export function PaginatedTable<T extends object>({
             <Button disabled={currentPage === 1} onClick={handlePreviousPage}>
               Previous
             </Button>
-            <span className="text-sm font-medium text-white">
+            <span className="text-sm font-medium text-black">
               Page {currentPage} of {totalPages}
             </span>
             <Button
